@@ -6,6 +6,7 @@ const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
 const Order = require("../model/order");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
+const sendMail = require("../utils/sendMail");
 
 // create new order
 router.post(
@@ -38,6 +39,17 @@ router.post(
         });
         orders.push(order);
       }
+
+       // Send an email to the user with the order ID
+       const userEmail = user.email;
+       const orderIds = orders.map(order => order._id);
+       const totalBill = totalPrice; // Calculate the total bill as needed
+ 
+       const emailSubject = "Order Confirmation";
+       const emailMessage = `Thank you for your order! Your order IDs are: ${orderIds.join(", ")}. Your total bill is: ${totalBill}`;
+ 
+       sendMail({ email: userEmail, subject: emailSubject, message: emailMessage });
+ 
 
       res.status(201).json({
         success: true,
